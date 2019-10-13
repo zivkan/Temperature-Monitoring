@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -13,9 +12,7 @@ namespace zivkan.TempMon.Service
 {
     public sealed class StartupTask : IBackgroundTask
     {
-        private BackgroundTaskDeferral _deferral;
         private AppServiceConnection _connection;
-        private CancellationTokenSource _cancellationTokenSource;
 
         public void Run(IBackgroundTaskInstance taskInstance)
         {
@@ -24,72 +21,45 @@ namespace zivkan.TempMon.Service
                 return;
             }
 
-            _deferral = taskInstance.GetDeferral();
-            taskInstance.Canceled += TaskInstance_Canceled;
-
             Debug.WriteLine("Starting " + taskInstance.InstanceId);
 
-            if (taskInstance.TriggerDetails == null)
+            switch (taskInstance.TriggerDetails)
             {
-                _cancellationTokenSource = new CancellationTokenSource();
+                case null:
+                    App.Create(taskInstance);
+                    CreateConnectionAsync();
+                    break;
 
-                Task.Delay(10000).ContinueWith(TimerTick);
-            }
-            else if (taskInstance.TriggerDetails is AppServiceTriggerDetails appServiceTriggerDetails)
-            {
-                _connection = appServiceTriggerDetails.AppServiceConnection;
-                _connection.RequestReceived += Connection_RequestReceived;
-            }
-            else
-            {
-                _deferral.Complete();
+                case AppServiceTriggerDetails appServiceTriggerDetails:
+                    App.Instance.AddConnection(taskInstance, appServiceTriggerDetails);
+                    break;
             }
         }
 
-        private async void TimerTick(Task task)
+        private async Task CreateConnectionAsync()
         {
-            if (_cancellationTokenSource?.IsCancellationRequested != false)
+            var connection = new AppServiceConnection();
+            connection.PackageFamilyName = Package.Current.Id.FamilyName;
+            connection.AppServiceName = "Sensor";
+            connection.RequestReceived += Connection_RequestReceived;
+            connection.ServiceClosed += Connection_ServiceClosed;
+            var result = await connection.OpenAsync();
+            if (result == AppServiceConnectionStatus.Success)
             {
-                return;
+                _connection = connection;
             }
-
-            Debug.WriteLine("Timer tick at {0:o}", DateTime.UtcNow);
-
-            if (_connection == null)
+            else
             {
-                try
-                {
-                    var connection = new AppServiceConnection();
-                    connection.PackageFamilyName = Package.Current.Id.FamilyName;
-                    connection.AppServiceName = "Sensor";
-                    var result = await connection.OpenAsync();
-                    if (result == AppServiceConnectionStatus.Success)
-                    {
-                        _connection = connection;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine("Excepion trying to open connection: " + e.Message);
-                }
+                Debug.WriteLine("Error connecting to app service");
             }
+        }
 
-            if (_connection != null)
-            {
-                var message = new ValueSet();
-                message["ping"] = "ping";
-                try
-                {
-                    var response = await _connection.SendMessageAsync(message);
-                    Debug.WriteLine("Message send status: " + response.Status);
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine("Exception sending message: " + e.Message);
-                }
-            }
-
-            Task.Delay(10000).ContinueWith(TimerTick);
+        private void Connection_ServiceClosed(AppServiceConnection sender, AppServiceClosedEventArgs args)
+        {
+            Debug.WriteLine("Connection service closed");
+            _connection.RequestReceived -= Connection_RequestReceived;
+            _connection.ServiceClosed -= Connection_ServiceClosed;
+            _connection = null;
         }
 
         private void Connection_RequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
@@ -109,21 +79,6 @@ namespace zivkan.TempMon.Service
             }
 
             return obj.ToString(Formatting.None);
-        }
-
-        private void TaskInstance_Canceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
-        {
-            Debug.WriteLine("Canceled " + sender.InstanceId);
-
-            _cancellationTokenSource?.Cancel();
-
-            if (_connection != null)
-            {
-                _connection.Dispose();
-                _connection = null;
-            }
-
-            _deferral.Complete();
         }
     }
 }
