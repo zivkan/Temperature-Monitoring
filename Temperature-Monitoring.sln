@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29319.158
+MinimumVisualStudioVersion = 15.0.26124.0
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "win10iot", "win10iot", "{820D6058-9423-4F72-AB68-43B87A8E2B91}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zivkan.TempMon.Service", "win10iot\zivkan.TempMon.Service\zivkan.TempMon.Service.csproj", "{2B8E4769-F326-42A1-8530-BAEB4737CE1A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|ARM = Debug|ARM
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|ARM = Release|ARM
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Debug|ARM.ActiveCfg = Debug|ARM
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Debug|ARM.Build.0 = Debug|ARM
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Debug|ARM.Deploy.0 = Debug|ARM
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Debug|x64.ActiveCfg = Debug|x64
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Debug|x64.Build.0 = Debug|x64
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Debug|x64.Deploy.0 = Debug|x64
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Debug|x86.ActiveCfg = Debug|x86
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Debug|x86.Build.0 = Debug|x86
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Debug|x86.Deploy.0 = Debug|x86
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Release|Any CPU.ActiveCfg = Release|x86
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Release|ARM.ActiveCfg = Release|ARM
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Release|ARM.Build.0 = Release|ARM
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Release|ARM.Deploy.0 = Release|ARM
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Release|x64.ActiveCfg = Release|x64
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Release|x64.Build.0 = Release|x64
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Release|x64.Deploy.0 = Release|x64
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Release|x86.ActiveCfg = Release|x86
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Release|x86.Build.0 = Release|x86
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A}.Release|x86.Deploy.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2B8E4769-F326-42A1-8530-BAEB4737CE1A} = {820D6058-9423-4F72-AB68-43B87A8E2B91}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5810BE47-0263-4ACE-BD83-1BB6DDBE787A}
+	EndGlobalSection
+EndGlobal
