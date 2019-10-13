@@ -46,6 +46,9 @@
             <iot:Task Type="startup" />
           </BackgroundTasks>
         </Extension>
+        <uap:Extension Category="windows.appService" EntryPoint="zivkan.TempMon.Service.StartupTask">
+          <uap:AppService Name="Sensor"/>
+        </uap:Extension>
       </Extensions>
     </Application>
   </Applications>
