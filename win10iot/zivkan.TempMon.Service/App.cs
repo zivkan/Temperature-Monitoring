@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.AppService;
@@ -46,6 +47,7 @@ namespace zivkan.TempMon.Service
 
         private CancellationTokenSource _cancellationTokenSource;
         private ConnectionManager _connectionManager;
+        private DeviceManager _deviceManager;
 
         private App(IBackgroundTaskInstance taskInstance)
         {
@@ -53,6 +55,7 @@ namespace zivkan.TempMon.Service
             _deferral = taskInstance.GetDeferral();
             _cancellationTokenSource = new CancellationTokenSource();
             _connectionManager = new ConnectionManager();
+            _deviceManager = new DeviceManager();
 
             taskInstance.Canceled += App_Closing;
 
@@ -76,7 +79,7 @@ namespace zivkan.TempMon.Service
             var next = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, now.Kind)
                 .AddMinutes(1);
             var delay = next - now;
-            Task.Delay(delay).ContinueWith(TimerTickAsync);
+            Task.Delay(delay).ContinueWith(TimerTickAsync).ConfigureAwait(false);
         }
 
         private async Task TimerTickAsync(Task task)
@@ -91,13 +94,23 @@ namespace zivkan.TempMon.Service
 
                 SetNextTimer();
 
-                var now = DateTime.UtcNow.ToString("o");
+                var now = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
 
                 Debug.WriteLine("Timer tick at " + now);
 
+                string result;
+                try
+                {
+                    result = await _deviceManager.GetMeasurement().ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    result = e.ToString();
+                }
+
                 var message = new ValueSet();
-                message["time"] = now;
-                await _connectionManager.BroadcastMessageAsync(message);
+                message["data"] = result;
+                await _connectionManager.BroadcastMessageAsync(message).ConfigureAwait(false);
             }
             finally
             {
