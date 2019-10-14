@@ -98,6 +98,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Bme280.cs" />
     <Compile Include="ConnectionManager.cs" />
     <Compile Include="DeviceManager.cs" />
     <Compile Include="StartupTask.cs" />
