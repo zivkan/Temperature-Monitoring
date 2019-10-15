@@ -10,34 +10,34 @@ namespace zivkan.TempMon.Service
     internal sealed class DeviceManager
     {
         private I2cDevice _device;
+        private Bme280 _bme280;
         private Task _initializeTask;
 
         public DeviceManager()
         {
-            Initialize();
+            InitializeAsync();
         }
 
-        public async Task<string> GetMeasurement()
+        public async Task<Bme280.Measurement> GetMeasurementAsync()
         {
             try
             {
-                await Initialize().ConfigureAwait(false);
+                await InitializeAsync().ConfigureAwait(false);
 
-                var writeData = new byte[] { 0x00 };
-                var readData = new byte[10];
-                _device.WriteRead(writeData, readData);
+                var measurement = await _bme280.GetMeasurementAsync().ConfigureAwait(false);
 
-                return string.Join(' ', readData.Select(b => b.ToString("x02", CultureInfo.InvariantCulture)));
+                return measurement;
             }
             catch
             {
                 _device = null;
+                _bme280 = null;
                 _initializeTask = null;
                 throw;
             }
         }
 
-        private Task Initialize()
+        private Task InitializeAsync()
         {
             if (_initializeTask == null || !_initializeTask.IsCompletedSuccessfully)
             {
@@ -53,10 +53,13 @@ namespace zivkan.TempMon.Service
                         };
 
                         _device = await I2cDevice.FromIdAsync(devices[0].Id, settings);
+
+                        _bme280 = await Bme280.CreateAsync(_device).ConfigureAwait(false);
                     }
                     catch
                     {
                         _device = null;
+                        _bme280 = null;
                         _initializeTask = null;
                         throw;
                     }

@@ -98,18 +98,20 @@ namespace zivkan.TempMon.Service
 
                 Debug.WriteLine("Timer tick at " + now);
 
-                string result;
+                var message = new ValueSet();
                 try
                 {
-                    result = await _deviceManager.GetMeasurement().ConfigureAwait(false);
+                    var result = await _deviceManager.GetMeasurementAsync().ConfigureAwait(false);
+                    message["temperature"] = result.Temperature;
+                    message["humidity"] = result.Humidity;
+                    message["pressure"] = result.Pressure;
+                    message["when"] = result.When.ToString("o", CultureInfo.InvariantCulture);
                 }
                 catch (Exception e)
                 {
-                    result = e.ToString();
+                    message["exception"] = e.ToString();
                 }
 
-                var message = new ValueSet();
-                message["data"] = result;
                 await _connectionManager.BroadcastMessageAsync(message).ConfigureAwait(false);
             }
             finally
